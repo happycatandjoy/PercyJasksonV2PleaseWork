@@ -390,6 +390,10 @@ choices.innerHTML = `
 
 <h3>🔓 IMPROVISE</h3>
 
+<p>
+Create your own action.
+</p>
+
 <input
 id="customAction"
 placeholder="Try anything...">
@@ -402,22 +406,6 @@ placeholder="Try anything...">
 
 }
 
-text:"🕵️ Look for clues",
-action:function(){
-
-game.wisdom++;
-
-chapterThree();
-
-}
-},
-
-{
-text:"🍪 Eat snacks instead",
-action:function(){
-
-game.chaos++;
-
 chapterThree();
 
 }
@@ -426,7 +414,140 @@ chapterThree();
 ]);
 
 }
+function trackChoice(type){
 
+if(type==="follow"){
+game.courage++;
+}
+
+if(type==="clues"){
+game.wisdom++;
+}
+
+if(type==="snacks"){
+game.chaos++;
+}
+
+chapterThree();
+
+}
+
+function customAction(){
+
+const action =
+document
+.getElementById("customAction")
+.value
+.toLowerCase();
+
+if(action.includes("hide")){
+
+show(`
+You hide behind a tree.
+
+Nobody notices you.
+
+👑 Secrets +1
+`);
+
+game.secrets++;
+
+}
+
+else if(
+action.includes("attack")
+||
+action.includes("fight")
+){
+
+show(`
+You rush toward danger.
+
+⚔️ Courage +1
+`);
+
+game.courage++;
+
+}
+
+else if(
+action.includes("talk")
+||
+action.includes("speak")
+||
+action.includes("negotiate")
+){
+
+show(`
+You try talking instead of fighting.
+
+Your companion looks impressed.
+
+💙 Friendship +1
+`);
+
+game.friendship++;
+
+}
+
+else if(
+action.includes("cookie")
+||
+action.includes("snack")
+){
+
+show(`
+Somehow your plan involves cookies.
+
+Again.
+
+😂 Chaos +1
+`);
+
+game.chaos++;
+
+}
+
+else if(
+action.includes("investigate")
+||
+action.includes("study")
+||
+action.includes("think")
+){
+
+show(`
+You carefully investigate the situation.
+
+🧠 Wisdom +1
+`);
+
+game.wisdom++;
+
+}
+
+else{
+
+show(`
+Nobody expected that.
+
+You try it anyway.
+
+😂 Chaos +1
+`);
+
+game.chaos++;
+
+}
+
+choice([
+{
+text:"Continue",
+action:chapterThree
+}
+]);
+
+}
 function chapterThree(){
 
 let companionText="";
