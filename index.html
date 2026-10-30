@@ -358,26 +358,50 @@ pegasusQuest();
 function pegasusQuest(){
 
 show(`
+<h2>🔓 NEW ABILITY UNLOCKED!</h2>
+
+Because this is your first real quest, you gain:
+
+✍️ IMPROVISE
+
+Demigods don't always follow the script.
+
 You and ${game.companion}
 follow strange tracks into the woods.
 
 How do you investigate?
 `);
 
-choice([
+choices.innerHTML = `
 
-{
-text:"🌲 Follow tracks",
-action:function(){
+<button onclick="trackChoice('follow')">
+🌲 Follow Tracks
+</button>
 
-game.courage++;
+<button onclick="trackChoice('clues')">
+🕵️ Look For Clues
+</button>
 
-chapterThree();
+<button onclick="trackChoice('snacks')">
+🍪 Eat Snacks
+</button>
+
+<hr>
+
+<h3>🔓 IMPROVISE</h3>
+
+<input
+id="customAction"
+placeholder="Try anything...">
+
+<button onclick="customAction()">
+✍️ Improvise
+</button>
+
+`;
 
 }
-},
 
-{
 text:"🕵️ Look for clues",
 action:function(){
 
