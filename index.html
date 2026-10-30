@@ -3,11 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Camp Half-Blood: V2</title>
+<title>Camp Half-Blood: The Prophecy V3</title>
 
 <style>
-
 body{
 background:#101820;
 color:white;
@@ -52,20 +50,27 @@ margin-bottom:20px;
 min-height:180px;
 }
 
+#memory{
+margin-top:15px;
+padding:10px;
+background:#182634;
+border-radius:10px;
+font-size:14px;
+}
 </style>
 </head>
 
 <body>
 
-<h1>🏕️ Camp Half-Blood: The Prophecy V2</h1>
+<h1>🏕️ Camp Half-Blood: The Prophecy V3</h1>
 
 <div id="story"></div>
-
 <div id="choices"></div>
+<div id="memory"></div>
 
 <script>
 
-let game = {
+let game={
 name:"",
 parent:"",
 companion:"",
@@ -73,14 +78,33 @@ courage:0,
 wisdom:0,
 friendship:0,
 chaos:0,
-secrets:0
+secrets:0,
+improvise:false,
+actionMemory:[],
+npcMemory:{}
 };
 
-const story =
-document.getElementById("story");
+const story=document.getElementById("story");
+const choices=document.getElementById("choices");
+const memory=document.getElementById("memory");
 
-const choices =
-document.getElementById("choices");
+function remember(text){
+game.actionMemory.push(text);
+updateMemory();
+}
+
+function npcRemember(npc,text){
+if(!game.npcMemory[npc]){
+game.npcMemory[npc]=[];
+}
+game.npcMemory[npc].push(text);
+}
+
+function updateMemory(){
+memory.innerHTML=
+"<b>Action Memory</b><br>"+
+game.actionMemory.slice(-5).join("<br>");
+}
 
 function show(text){
 story.innerHTML=text;
@@ -93,11 +117,8 @@ choices.innerHTML="";
 for(const option of options){
 
 const btn=document.createElement("button");
-
 btn.textContent=option.text;
-
 btn.onclick=option.action;
-
 choices.appendChild(btn);
 
 }
@@ -112,34 +133,21 @@ function characterCreator(){
 
 show(`
 <h2>Create Your Demigod</h2>
-
 Choose your name and godly parent.
 `);
 
 choices.innerHTML=`
-
-<input
-id="playerName"
-placeholder="Enter Your Name">
+<input id="playerName" placeholder="Enter Your Name">
 
 <button onclick="chooseParent('Poseidon')">🔱 Poseidon</button>
-
 <button onclick="chooseParent('Athena')">🦉 Athena</button>
-
 <button onclick="chooseParent('Apollo')">☀️ Apollo</button>
-
 <button onclick="chooseParent('Hades')">💀 Hades</button>
-
 <button onclick="chooseParent('Hermes')">👜 Hermes</button>
-
 <button onclick="chooseParent('Ares')">⚔️ Ares</button>
-
 <button onclick="chooseParent('Demeter')">🌾 Demeter</button>
-
 <button onclick="chooseParent('Hephaestus')">⚒️ Hephaestus</button>
-
 <button onclick="randomHero()">🎲 Random Hero</button>
-
 `;
 
 }
@@ -147,10 +155,9 @@ placeholder="Enter Your Name">
 function chooseParent(parent){
 
 game.parent=parent;
+game.name=document.getElementById("playerName").value||"Demigod";
 
-game.name=
-document.getElementById("playerName").value
-|| "Demigod";
+remember("Chosen by "+parent);
 
 chapterOne();
 
@@ -158,15 +165,7 @@ chapterOne();
 
 function randomHero(){
 
-const names=[
-"Alex",
-"Hazel",
-"Jason",
-"Piper",
-"Leo",
-"Nico",
-"Annabeth"
-];
+const names=["Alex","Hazel","Jason","Piper","Leo","Nico","Annabeth"];
 
 const parents=[
 "Poseidon",
@@ -179,11 +178,10 @@ const parents=[
 "Hephaestus"
 ];
 
-game.name=
-names[Math.floor(Math.random()*names.length)];
+game.name=names[Math.floor(Math.random()*names.length)];
+game.parent=parents[Math.floor(Math.random()*parents.length)];
 
-game.parent=
-parents[Math.floor(Math.random()*parents.length)];
+remember("Random destiny selected");
 
 chapterOne();
 
@@ -210,33 +208,40 @@ choice([
 {
 text:"🔱 Raise your weapon proudly",
 action:function(){
-
 game.courage++;
-
+remember("Raised weapon proudly");
+npcRemember("Clarisse","Respects bravery");
 chapterOneReaction();
-
 }
 },
 
 {
 text:"🤫 Stay quiet",
 action:function(){
-
 game.wisdom++;
-
+remember("Stayed silent");
+npcRemember("Annabeth","Noticed wisdom");
 chapterOneReaction();
-
 }
 },
 
 {
 text:"😂 Ask for blue cookies",
 action:function(){
-
 game.chaos++;
-
+remember("Asked for blue cookies");
+npcRemember("Hermes Cabin","Found you funny");
 chapterOneReaction();
+}
+},
 
+{
+text:"🎭 Improvise a speech",
+action:function(){
+game.improvise=true;
+game.friendship++;
+remember("Unlocked IMPROVISE");
+chapterOneReaction();
 }
 }
 
@@ -249,33 +254,19 @@ function chapterOneReaction(){
 let text="";
 
 if(game.courage>0){
-
-text=`
-Clarisse smirks.
-
-"At least you've got guts."
-`;
-
+text="Clarisse smirks. \"At least you've got guts.\"";
 }
 
 if(game.wisdom>0){
-
-text=`
-Annabeth nods.
-
-"You seem smarter than most campers."
-`;
-
+text="Annabeth nods. \"You seem smarter than most campers.\"";
 }
 
 if(game.chaos>0){
+text="The Hermes cabin bursts out laughing and throws cookies.";
+}
 
-text=`
-The Hermes cabin bursts out laughing.
-
-Someone tosses you a blue cookie.
-`;
-
+if(game.improvise){
+text="The entire camp applauds your improvised speech.";
 }
 
 show(text);
@@ -298,6 +289,10 @@ A Pegasus has disappeared.
 
 Chiron chooses you for the quest.
 
+A new skill awakens.
+
+✅ IMPROVISE UNLOCKED
+
 Who joins you?
 `);
 
@@ -306,48 +301,43 @@ choice([
 {
 text:"🦉 Annabeth",
 action:function(){
-
 game.companion="Annabeth";
 game.wisdom++;
-
+npcRemember("Annabeth","Joined your quest");
+remember("Chose Annabeth");
 pegasusQuest();
-
 }
 },
 
 {
 text:"🐐 Grover",
 action:function(){
-
 game.companion="Grover";
 game.friendship++;
-
+npcRemember("Grover","Trusts you");
+remember("Chose Grover");
 pegasusQuest();
-
 }
 },
 
 {
 text:"💀 Nico",
 action:function(){
-
 game.companion="Nico";
 game.secrets++;
-
+npcRemember("Nico","Watching carefully");
+remember("Chose Nico");
 pegasusQuest();
-
 }
 },
 
 {
 text:"⚔️ Go Alone",
 action:function(){
-
 game.companion="Nobody";
 game.courage++;
-
+remember("Went alone");
 pegasusQuest();
-
 }
 }
 
@@ -358,218 +348,77 @@ pegasusQuest();
 function pegasusQuest(){
 
 show(`
-<h2>🔓 NEW ABILITY UNLOCKED!</h2>
-
-Because this is your first real quest, you gain:
-
-✍️ IMPROVISE
-
-Demigods don't always follow the script.
-
 You and ${game.companion}
 follow strange tracks into the woods.
 
 How do you investigate?
 `);
 
-choices.innerHTML = `
+let options=[
 
-<button onclick="trackChoice('follow')">
-🌲 Follow Tracks
-</button>
-
-<button onclick="trackChoice('clues')">
-🕵️ Look For Clues
-</button>
-
-<button onclick="trackChoice('snacks')">
-🍪 Eat Snacks
-</button>
-
-<hr>
-
-<h3>🔓 IMPROVISE</h3>
-
-<p>
-Create your own action.
-</p>
-
-<input
-id="customAction"
-placeholder="Try anything...">
-
-<button onclick="customAction()">
-✍️ Improvise
-</button>
-
-`;
-
-}
-
-chapterThree();
-
-}
-}
-
-]);
-
-}
-function trackChoice(type){
-
-if(type==="follow"){
-game.courage++;
-}
-
-if(type==="clues"){
-game.wisdom++;
-}
-
-if(type==="snacks"){
-game.chaos++;
-}
-
-chapterThree();
-
-}
-
-function customAction(){
-
-const action =
-document
-.getElementById("customAction")
-.value
-.toLowerCase();
-
-if(action.includes("hide")){
-
-show(`
-You hide behind a tree.
-
-Nobody notices you.
-
-👑 Secrets +1
-`);
-
-game.secrets++;
-
-}
-
-else if(
-action.includes("attack")
-||
-action.includes("fight")
-){
-
-show(`
-You rush toward danger.
-
-⚔️ Courage +1
-`);
-
-game.courage++;
-
-}
-
-else if(
-action.includes("talk")
-||
-action.includes("speak")
-||
-action.includes("negotiate")
-){
-
-show(`
-You try talking instead of fighting.
-
-Your companion looks impressed.
-
-💙 Friendship +1
-`);
-
-game.friendship++;
-
-}
-
-else if(
-action.includes("cookie")
-||
-action.includes("snack")
-){
-
-show(`
-Somehow your plan involves cookies.
-
-Again.
-
-😂 Chaos +1
-`);
-
-game.chaos++;
-
-}
-
-else if(
-action.includes("investigate")
-||
-action.includes("study")
-||
-action.includes("think")
-){
-
-show(`
-You carefully investigate the situation.
-
-🧠 Wisdom +1
-`);
-
-game.wisdom++;
-
-}
-
-else{
-
-show(`
-Nobody expected that.
-
-You try it anyway.
-
-😂 Chaos +1
-`);
-
-game.chaos++;
-
-}
-
-choice([
 {
-text:"Continue",
-action:chapterThree
+text:"🌲 Follow tracks",
+action:function(){
+game.courage++;
+remember("Followed tracks");
+chapterThree();
 }
-]);
+},
+
+{
+text:"🕵️ Look for clues",
+action:function(){
+game.wisdom++;
+remember("Searched clues");
+chapterThree();
+}
+},
+
+{
+text:"🍪 Eat snacks instead",
+action:function(){
+game.chaos++;
+remember("Ignored danger for snacks");
+chapterThree();
+}
+}
+
+];
+
+if(game.improvise){
+options.push({
+text:"🎭 IMPROVISE",
+action:function(){
+game.friendship++;
+game.wisdom++;
+remember("Improvised investigation");
+chapterThree();
+}
+});
+}
+
+choice(options);
 
 }
+
 function chapterThree(){
 
 let companionText="";
 
 if(game.companion==="Annabeth"){
-companionText=
-"Annabeth studies every clue carefully.";
+companionText="Annabeth remembers how calm you were.";
 }
 
 if(game.companion==="Grover"){
-companionText=
-"Grover looks nervous but refuses to leave.";
+companionText="Grover remembers your earlier choices.";
 }
 
 if(game.companion==="Nico"){
-companionText=
-"Nico notices something hidden in the shadows.";
+companionText="Nico remembers everything you've said.";
 }
 
 if(game.companion==="Nobody"){
-companionText=
-"You are completely alone.";
+companionText="You travel alone with your thoughts.";
 }
 
 show(`
@@ -589,33 +438,37 @@ choice([
 {
 text:"Tell Chiron",
 action:function(){
-
 game.wisdom++;
-
+remember("Told Chiron");
 chapterFour();
-
 }
 },
 
 {
 text:"Investigate Alone",
 action:function(){
-
 game.secrets++;
-
+remember("Investigated alone");
 chapterFour();
-
 }
 },
 
 {
 text:"Tell Everyone",
 action:function(){
-
 game.courage++;
-
+remember("Warned the camp");
 chapterFour();
+}
+},
 
+{
+text:"🎭 IMPROVISE A PLAN",
+action:function(){
+game.friendship++;
+game.wisdom++;
+remember("Improvised a strategy");
+chapterFour();
 }
 }
 
@@ -642,33 +495,36 @@ choice([
 {
 text:"🛡️ Watch her reflection",
 action:function(){
-
 game.wisdom+=2;
-
+remember("Used reflection");
 ending();
-
 }
 },
 
 {
 text:"⚔️ Attack immediately",
 action:function(){
-
 game.courage+=2;
-
+remember("Attacked Medusa");
 ending();
-
 }
 },
 
 {
 text:"🍔 Ask for food",
 action:function(){
-
 game.chaos+=2;
-
+remember("Asked Medusa for food");
 ending();
+}
+},
 
+{
+text:"🎭 Distract her with improv",
+action:function(){
+game.friendship+=2;
+remember("Distracted Medusa");
+ending();
 }
 }
 
@@ -681,56 +537,45 @@ function ending(){
 let endingTitle="";
 
 if(game.wisdom>=3){
-
 endingTitle="📜 CHILD OF PROPHECY";
-
 }
 else if(game.courage>=3){
-
 endingTitle="🏆 HERO OF OLYMPUS";
-
 }
 else if(game.secrets>=2){
-
 endingTitle="👑 CHAMPION OF KRONOS";
-
 }
 else if(game.chaos>=3){
-
 endingTitle="🍪 LORD OF BLUE COOKIES";
-
 }
 else{
-
 endingTitle="💙 TRUE FRIEND";
 }
 
 show(`
 <h2>${endingTitle}</h2>
 
-Name: ${game.name}
+Name: ${game.name}<br><br>
 
-Parent: ${game.parent}
+Parent: ${game.parent}<br><br>
 
-Companion: ${game.companion}
+Companion: ${game.companion}<br><br>
 
-Stats:
+⚔️ Courage: ${game.courage}<br>
+🧠 Wisdom: ${game.wisdom}<br>
+💙 Friendship: ${game.friendship}<br>
+😂 Chaos: ${game.chaos}<br>
+👑 Secrets: ${game.secrets}<br><br>
 
-⚔️ Courage: ${game.courage}
+NPC Memories: ${Object.keys(game.npcMemory).length}<br><br>
 
-🧠 Wisdom: ${game.wisdom}
+<h3>Chapter 5 Teaser</h3>
 
-💙 Friendship: ${game.friendship}
+The traitor has already spoken with Kronos.
 
-😂 Chaos: ${game.chaos}
+Someone inside Camp Half-Blood is hiding the truth.
 
-👑 Secrets: ${game.secrets}
-
-Thank you for playing V2.
-
-Chapter 5:
-The Traitor
-Coming Soon...
+And they know your name.
 `);
 
 choices.innerHTML="";
@@ -738,6 +583,110 @@ choices.innerHTML="";
 }
 
 </script>
-
 </body>
 </html>
+CHUNK 2
+
+// ADD TO GAME OBJECT
+
+improvise:false,
+actionMemory:[],
+npcMemory:{}
+
+// ADD FUNCTIONS
+
+function remember(text){
+game.actionMemory.push(text);
+}
+
+function npcRemember(npc,text){
+if(!game.npcMemory[npc]){
+game.npcMemory[npc]=[];
+}
+game.npcMemory[npc].push(text);
+}
+
+// CHAPTER 1 NEW CHOICE
+
+{
+text:"🎭 Improvise a speech",
+action:function(){
+game.improvise=true;
+game.friendship++;
+remember("Unlocked IMPROVISE");
+chapterOneReaction();
+}
+}
+
+// CHAPTER 2 ADD
+
+show(`
+...
+✅ IMPROVISE UNLOCKED
+...
+`);
+
+// PEGASUS QUEST EXTRA CHOICE
+
+if(game.improvise){
+options.push({
+text:"🎭 IMPROVISE",
+action:function(){
+game.friendship++;
+game.wisdom++;
+remember("Improvised investigation");
+chapterThree();
+}
+});
+}
+
+// NPC MEMORY EXAMPLES
+
+npcRemember("Annabeth","You impressed her");
+npcRemember("Grover","Trusts you");
+npcRemember("Nico","Suspicious of Kronos");
+
+// ACTION MEMORY EXAMPLES
+
+remember("Raised weapon");
+remember("Stayed silent");
+remember("Warned camp");
+remember("Investigated alone");
+
+// CHAPTER 3 REACTIONS
+
+if(game.companion==="Annabeth"){
+companionText="Annabeth remembers your earlier choices.";
+}
+
+if(game.companion==="Grover"){
+companionText="Grover trusts you because of what happened before.";
+}
+
+if(game.companion==="Nico"){
+companionText="Nico remembers more than he admits.";
+}
+
+// CHAPTER 4 EXTRA CHOICE
+
+{
+text:"🎭 Distract her with improv",
+action:function(){
+game.friendship+=2;
+remember("Distracted Medusa");
+ending();
+}
+}
+
+// ENDING ADD
+
+NPC Memories: ${Object.keys(game.npcMemory).length}
+
+<h3>Chapter 5 Teaser</h3>
+
+The traitor has already spoken with Kronos.
+
+Someone inside Camp Half-Blood is hiding the truth.
+
+And they know your name.
+
