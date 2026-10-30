@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Camp Half-Blood: V2</title>
+
+<style>
+
+body{
+background:#101820;
+color:white;
+font-family:Georgia,serif;
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+button{
+display:block;
+width:100%;
+padding:15px;
+margin:8px 0;
+font-size:18px;
+border:none;
+border-radius:10px;
+background:#3a6ea5;
+color:white;
+cursor:pointer;
+}
+
+button:hover{
+background:#4f86c6;
+}
+
+input{
+width:100%;
+padding:12px;
+margin-bottom:10px;
+font-size:18px;
+}
+
+#story{
+font-size:22px;
+line-height:1.6;
+margin-bottom:20px;
+min-height:180px;
+}
+
+</style>
+</head>
+
+<body>
+
+<h1>🏕️ Camp Half-Blood: The Prophecy V2</h1>
+
+<div id="story"></div>
+
+<div id="choices"></div>
+
+<script>
+
+let game = {
+name:"",
+parent:"",
+companion:"",
+courage:0,
+wisdom:0,
+friendship:0,
+chaos:0,
+secrets:0
+};
+
+const story =
+document.getElementById("story");
+
+const choices =
+document.getElementById("choices");
+
+function show(text){
+story.innerHTML=text;
+}
+
+function choice(options){
+
+choices.innerHTML="";
+
+for(const option of options){
+
+const btn=document.createElement("button");
+
+btn.textContent=option.text;
+
+btn.onclick=option.action;
+
+choices.appendChild(btn);
+
+}
+
+}
+
+window.onload=function(){
+characterCreator();
+};
+
+function characterCreator(){
+
+show(`
+<h2>Create Your Demigod</h2>
+
+Choose your name and godly parent.
+`);
+
+choices.innerHTML=`
+
+<input
+id="playerName"
+placeholder="Enter Your Name">
+
+<button onclick="chooseParent('Poseidon')">🔱 Poseidon</button>
+
+<button onclick="chooseParent('Athena')">🦉 Athena</button>
+
+<button onclick="chooseParent('Apollo')">☀️ Apollo</button>
+
+<button onclick="chooseParent('Hades')">💀 Hades</button>
+
+<button onclick="chooseParent('Hermes')">👜 Hermes</button>
+
+<button onclick="chooseParent('Ares')">⚔️ Ares</button>
+
+<button onclick="chooseParent('Demeter')">🌾 Demeter</button>
+
+<button onclick="chooseParent('Hephaestus')">⚒️ Hephaestus</button>
+
+<button onclick="randomHero()">🎲 Random Hero</button>
+
+`;
+
+}
+
+function chooseParent(parent){
+
+game.parent=parent;
+
+game.name=
+document.getElementById("playerName").value
+|| "Demigod";
+
+chapterOne();
+
+}
+
+function randomHero(){
+
+const names=[
+"Alex",
+"Hazel",
+"Jason",
+"Piper",
+"Leo",
+"Nico",
+"Annabeth"
+];
+
+const parents=[
+"Poseidon",
+"Athena",
+"Apollo",
+"Hades",
+"Hermes",
+"Ares",
+"Demeter",
+"Hephaestus"
+];
+
+game.name=
+names[Math.floor(Math.random()*names.length)];
+
+game.parent=
+parents[Math.floor(Math.random()*parents.length)];
+
+chapterOne();
+
+}
+
+function chapterOne(){
+
+show(`
+<h2>Chapter 1: Claimed</h2>
+
+Welcome ${game.name}.
+
+You are a child of ${game.parent}.
+
+A glowing symbol appears above your head.
+
+The camp erupts in cheers.
+
+What do you do?
+`);
+
+choice([
+
+{
+text:"🔱 Raise your weapon proudly",
+action:function(){
+
+game.courage++;
+
+chapterOneReaction();
+
+}
+},
+
+{
+text:"🤫 Stay quiet",
+action:function(){
+
+game.wisdom++;
+
+chapterOneReaction();
+
+}
+},
+
+{
+text:"😂 Ask for blue cookies",
+action:function(){
+
+game.chaos++;
+
+chapterOneReaction();
+
+}
+}
+
+]);
+
+}
+
+function chapterOneReaction(){
+
+let text="";
+
+if(game.courage>0){
+
+text=`
+Clarisse smirks.
+
+"At least you've got guts."
+`;
+
+}
+
+if(game.wisdom>0){
+
+text=`
+Annabeth nods.
+
+"You seem smarter than most campers."
+`;
+
+}
+
+if(game.chaos>0){
+
+text=`
+The Hermes cabin bursts out laughing.
+
+Someone tosses you a blue cookie.
+`;
+
+}
+
+show(text);
+
+choice([
+{
+text:"Continue",
+action:chapterTwo
+}
+]);
+
+}
+
+function chapterTwo(){
+
+show(`
+<h2>Chapter 2: The Missing Pegasus</h2>
+
+A Pegasus has disappeared.
+
+Chiron chooses you for the quest.
+
+Who joins you?
+`);
+
+choice([
+
+{
+text:"🦉 Annabeth",
+action:function(){
+
+game.companion="Annabeth";
+game.wisdom++;
+
+pegasusQuest();
+
+}
+},
+
+{
+text:"🐐 Grover",
+action:function(){
+
+game.companion="Grover";
+game.friendship++;
+
+pegasusQuest();
+
+}
+},
+
+{
+text:"💀 Nico",
+action:function(){
+
+game.companion="Nico";
+game.secrets++;
+
+pegasusQuest();
+
+}
+},
+
+{
+text:"⚔️ Go Alone",
+action:function(){
+
+game.companion="Nobody";
+game.courage++;
+
+pegasusQuest();
+
+}
+}
+
+]);
+
+}
+
+function pegasusQuest(){
+
+show(`
+You and ${game.companion}
+follow strange tracks into the woods.
+
+How do you investigate?
+`);
+
+choice([
+
+{
+text:"🌲 Follow tracks",
+action:function(){
+
+game.courage++;
+
+chapterThree();
+
+}
+},
+
+{
+text:"🕵️ Look for clues",
+action:function(){
+
+game.wisdom++;
+
+chapterThree();
+
+}
+},
+
+{
+text:"🍪 Eat snacks instead",
+action:function(){
+
+game.chaos++;
+
+chapterThree();
+
+}
+}
+
+]);
+
+}
+
+function chapterThree(){
+
+let companionText="";
+
+if(game.companion==="Annabeth"){
+companionText=
+"Annabeth studies every clue carefully.";
+}
+
+if(game.companion==="Grover"){
+companionText=
+"Grover looks nervous but refuses to leave.";
+}
+
+if(game.companion==="Nico"){
+companionText=
+"Nico notices something hidden in the shadows.";
+}
+
+if(game.companion==="Nobody"){
+companionText=
+"You are completely alone.";
+}
+
+show(`
+<h2>Chapter 3: The Titan Symbol</h2>
+
+${companionText}
+
+You discover a dark symbol carved into a tree.
+
+The mark belongs to Kronos.
+
+What do you do?
+`);
+
+choice([
+
+{
+text:"Tell Chiron",
+action:function(){
+
+game.wisdom++;
+
+chapterFour();
+
+}
+},
+
+{
+text:"Investigate Alone",
+action:function(){
+
+game.secrets++;
+
+chapterFour();
+
+}
+},
+
+{
+text:"Tell Everyone",
+action:function(){
+
+game.courage++;
+
+chapterFour();
+
+}
+}
+
+]);
+
+}
+
+function chapterFour(){
+
+show(`
+<h2>Chapter 4: Medusa's Garden</h2>
+
+Beautiful statues fill a garden.
+
+Far too many statues.
+
+A woman welcomes you.
+
+What do you do?
+`);
+
+choice([
+
+{
+text:"🛡️ Watch her reflection",
+action:function(){
+
+game.wisdom+=2;
+
+ending();
+
+}
+},
+
+{
+text:"⚔️ Attack immediately",
+action:function(){
+
+game.courage+=2;
+
+ending();
+
+}
+},
+
+{
+text:"🍔 Ask for food",
+action:function(){
+
+game.chaos+=2;
+
+ending();
+
+}
+}
+
+]);
+
+}
+
+function ending(){
+
+let endingTitle="";
+
+if(game.wisdom>=3){
+
+endingTitle="📜 CHILD OF PROPHECY";
+
+}
+else if(game.courage>=3){
+
+endingTitle="🏆 HERO OF OLYMPUS";
+
+}
+else if(game.secrets>=2){
+
+endingTitle="👑 CHAMPION OF KRONOS";
+
+}
+else if(game.chaos>=3){
+
+endingTitle="🍪 LORD OF BLUE COOKIES";
+
+}
+else{
+
+endingTitle="💙 TRUE FRIEND";
+}
+
+show(`
+<h2>${endingTitle}</h2>
+
+Name: ${game.name}
+
+Parent: ${game.parent}
+
+Companion: ${game.companion}
+
+Stats:
+
+⚔️ Courage: ${game.courage}
+
+🧠 Wisdom: ${game.wisdom}
+
+💙 Friendship: ${game.friendship}
+
+😂 Chaos: ${game.chaos}
+
+👑 Secrets: ${game.secrets}
+
+Thank you for playing V2.
+
+Chapter 5:
+The Traitor
+Coming Soon...
+`);
+
+choices.innerHTML="";
+
+}
+
+</script>
+
+</body>
+</html>
